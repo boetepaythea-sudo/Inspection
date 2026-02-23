@@ -331,11 +331,10 @@
                             <label for="inspectorSelect">Inspector</label>
                             <select id="inspectorSelect" required>
                                 <option value="">-- Pilih Inspector --</option>
-                                <option>Andi</option>
-                                <option>Budi</option>
-                                <option>Citra</option>
-                                <option>Dewi</option>
-                                <option>Eka</option>
+                                <option>Suratno</option>
+                                <option>Edi</option>
+                                <option>Gumilang Sanjaya</option>
+                                <option>Yustinus Eko</option>
                             </select>
                         </div>
 
@@ -488,7 +487,10 @@
                             <option value="">-- Pilih Vendor --</option>
                         </select> <label for="inventoryPO">Filter PO</label> <select id="inventoryPO" disabled>
                             <option value="">-- Pilih PO --</option>
-                        </select> </div> <!-- Table Inventory -->
+                        </select>
+                        <button id="btnExportPDF">Export PDF</button>
+                    </div>
+                    <!-- Table Inventory -->
                     <div class="table-wrapper">
                         <table id="inventoryTable">
                             <thead>
@@ -529,6 +531,10 @@
                 </section>
             </main>
         </div>
+        <!-- Library JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -581,218 +587,269 @@
                 }
             });
 
-            document.addEventListener("DOMContentLoaded", () => {
 
-                /* ================= MASTER DATA PO ================= */
+            /* ================= MASTER DATA PO ================= */
 
-                const dataByKode = {
+            const dataByKode = {
 
-                    "CG2510-01": {
-                        Vendor: "V01 PT. AGUNG JAYA",
-                        items: [
-                            {
-                                item: "OT-68RA52-NT",
-                                qty: 25,
-                                desc: "Raffia Wrapped K/D Console Table",
-                                image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
-                            },
-                            {
-                                item: "ST-68522-BK",
-                                qty: 25,
-                                desc: "22 Inch Round X Base Side Table",
-                                image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
-                            }
-                        ]
-                    },
-                    "CG2510-02": {
-                        Vendor: "V01 PT. AGUNG JAYA",
-                        items: [
-                            {
-                                item: "OT-68RA52-NT",
-                                qty: 25,
-                                desc: "Raffia Wrapped K/D Console Table",
-                                image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
-                            },
-                            {
-                                item: "ST-68522-BK",
-                                qty: 25,
-                                desc: "22 Inch Round X Base Side Table",
-                                image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
-                            }
-                        ]
-                    },
-                    "CG2510-03": {
-                        Vendor: "V02 PT. INDAH PERMATA",
-                        items: [
-                            {
-                                item: "OT-68RA52-NT",
-                                qty: 25,
-                                desc: "Raffia Wrapped K/D Console Table",
-                                image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
-                            },
-                            {
-                                item: "ST-68522-BK",
-                                qty: 25,
-                                desc: "22 Inch Round X Base Side Table",
-                                image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
-                            }
-                        ]
-                    },
-                    "JW2510-03": {
-                        Vendor: "V03 CV. JAYA ABADI",
-                        items: [
-                            {
-                                item: "CT-70115",
-                                qty: 13,
-                                desc: "Borneo Round Abaca Coffee Table",
-                                image: "https://6694454.app.netsuite.com/c.6694454/item-images/CT-70115_001.jpg"
-                            }
-                        ]
-                    }
+                "CG2510-01": {
+                    Vendor: "V01 PT. AGUNG JAYA",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
+                        }
+                    ]
+                },
+                "CG2510-02": {
+                    Vendor: "V01 PT. AGUNG JAYA",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
+                        }
+                    ]
+                },
+                "CG2510-03": {
+                    Vendor: "V01 PT. AGUNG JAYA",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
+                        }
+                    ]
+                },
+                "CG2510-04": {
+                    Vendor: "V02 PT. INDAH PERMATA",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
+                        }
+                    ]
+                },
+                "CG2510-05": {
+                    Vendor: "V02 PT. INDAH PERMATA",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
+                        }
+                    ]
+                },
+                "JW2510-03": {
+                    Vendor: "V03 CV. JAYA ABADI",
+                    items: [
+                        {
+                            item: "CT-70115",
+                            qty: 13,
+                            desc: "Borneo Round Abaca Coffee Table",
+                            image: "https://6694454.app.netsuite.com/c.6694454/item-images/CT-70115_001.jpg"
+                        }
+                    ]
+                },
+                "JW2510-04": {
+                    Vendor: "V03 CV. JAYA ABADI",
+                    items: [
+                        {
+                            item: "OT-68RA52-NT",
+                            qty: 25,
+                            desc: "Raffia Wrapped K/D Console Table",
+                            image: "https://www.jeffan.com/item-images/OT-68RA52-NT_001.jpg"
+                        },
+                        {
+                            item: "ST-68522-BK",
+                            qty: 25,
+                            desc: "22 Inch Round X Base Side Table",
+                            image: "https://www.jeffan.com/item-images/ST-68522-BK_001.jpg"
 
-                };
-                // ================= STEP 1 =================
-                const rejectRules = [
-                    { minAql: 2, maxAql: 13, maxReject: 0 },
-                    { minAql: 20, maxAql: 20, maxReject: 1 },
-                    { minAql: 32, maxAql: 32, maxReject: 2 },
-                    { minAql: 50, maxAql: 50, maxReject: 3 }
-                ];
-
-                let headers = [];
-
-                const vendorSelect = document.getElementById("vendorSelect");
-                const poSelect = document.getElementById("poSelect");
-                const saveHeaderBtn = document.getElementById("saveHeaderBtn");
-                const backToMenuBtn = document.getElementById("backToMenuBtn");
-                const filterVendor = document.getElementById("filterVendor");
-                const filterPO = document.getElementById("filterPO");
-                const headerTableBody = document.getElementById("headerTableBody");
-
-                // Inisialisasi vendor di input form
-                const allVendors = [...new Set(Object.values(dataByKode).map(po => po.Vendor))];
-                allVendors.forEach(v => { let opt = document.createElement("option"); opt.value = v; opt.textContent = v; vendorSelect.appendChild(opt); });
-
-                function getPOsByVendor(vendor) { return Object.keys(dataByKode).filter(po => dataByKode[po].Vendor === vendor); }
-                vendorSelect.addEventListener("change", () => {
-                    poSelect.innerHTML = '<option value="">-- Pilih PO --</option>';
-                    const selectedVendor = vendorSelect.value;
-                    if (!selectedVendor) { poSelect.disabled = true; return; }
-                    getPOsByVendor(selectedVendor).forEach(po => { let opt = document.createElement("option"); opt.value = po; opt.textContent = po; poSelect.appendChild(opt); });
-                    poSelect.disabled = false;
-                });
-
-                // ================= FILTER HEADER =================
-                function updateFilterVendor() {
-                    filterVendor.innerHTML = '<option value="">-- Pilih Vendor --</option>';
-                    const vendorsFromHeader = [...new Set(headers.map(h => h.vendor))];
-                    if (vendorsFromHeader.length === 0) { filterVendor.disabled = true; filterPO.disabled = true; headerTableBody.innerHTML = ""; return; }
-                    filterVendor.disabled = false;
-                    vendorsFromHeader.forEach(v => { let opt = document.createElement("option"); opt.value = v; opt.textContent = v; filterVendor.appendChild(opt); });
-                    // Reset PO filter
-                    filterPO.innerHTML = '<option value="">-- Pilih PO --</option>';
-                    filterPO.disabled = true;
-                    headerTableBody.innerHTML = "";
+                        }
+                    ]
                 }
 
-                filterVendor.addEventListener("change", () => {
-                    const selVendor = filterVendor.value;
-                    filterPO.innerHTML = '<option value="">-- Pilih PO --</option>';
-                    if (!selVendor) { filterPO.disabled = true; headerTableBody.innerHTML = ""; return; }
-                    const posFromHeader = [...new Set(headers.filter(h => h.vendor === selVendor).map(h => h.po))];
-                    posFromHeader.forEach(po => { let opt = document.createElement("option"); opt.value = po; opt.textContent = po; filterPO.appendChild(opt); });
-                    filterPO.disabled = false;
-                    headerTableBody.innerHTML = "";
-                    renderTable();
-                });
+            };
+            // ================= STEP 1 =================
+            const rejectRules = [
+                { minAql: 2, maxAql: 13, maxReject: 0 },
+                { minAql: 20, maxAql: 20, maxReject: 1 },
+                { minAql: 32, maxAql: 32, maxReject: 2 },
+                { minAql: 50, maxAql: 50, maxReject: 3 }
+            ];
 
-                filterPO.addEventListener("change", renderTable);
+            let headers = [];
 
-                // ================= AQL & RESULT =================
-                function hitungAQL(qty) {
-                    if (qty >= 2 && qty <= 8) return 2;
-                    if (qty >= 9 && qty <= 15) return 3;
-                    if (qty >= 16 && qty <= 25) return 5;
-                    if (qty >= 26 && qty <= 50) return 8;
-                    if (qty >= 51 && qty <= 90) return 13;
-                    if (qty >= 91 && qty <= 150) return 20;
-                    if (qty >= 151 && qty <= 280) return 32;
-                    if (qty >= 281 && qty <= 500) return 50;
-                    return Math.ceil(qty * 0.2);
-                }
+            const vendorSelect = document.getElementById("vendorSelect");
+            const poSelect = document.getElementById("poSelect");
+            const saveHeaderBtn = document.getElementById("saveHeaderBtn");
+            const backToMenuBtn = document.getElementById("backToMenuBtn");
+            const filterVendor = document.getElementById("filterVendor");
+            const filterPO = document.getElementById("filterPO");
+            const headerTableBody = document.getElementById("headerTableBody");
 
-                function hitungResult(aql, rejected) { const rule = rejectRules.find(r => aql >= r.minAql && aql <= r.maxAql); if (!rule) return "UNDEFINED"; return rejected <= rule.maxReject ? "APPROVED" : "FAILED"; }
+            // Inisialisasi vendor di input form
+            const allVendors = [...new Set(Object.values(dataByKode).map(po => po.Vendor))];
+            allVendors.forEach(v => { let opt = document.createElement("option"); opt.value = v; opt.textContent = v; vendorSelect.appendChild(opt); });
 
-                // ================= LOAD HEADER DARI FIREBASE =================
-                async function loadHeaders() {
-                    const snapshot = await getDocs(collection(db, "headers"));
-                    headers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            function getPOsByVendor(vendor) { return Object.keys(dataByKode).filter(po => dataByKode[po].Vendor === vendor); }
+            vendorSelect.addEventListener("change", () => {
+                poSelect.innerHTML = '<option value="">-- Pilih PO --</option>';
+                const selectedVendor = vendorSelect.value;
+                if (!selectedVendor) { poSelect.disabled = true; return; }
+                getPOsByVendor(selectedVendor).forEach(po => { let opt = document.createElement("option"); opt.value = po; opt.textContent = po; poSelect.appendChild(opt); });
+                poSelect.disabled = false;
+            });
+
+            // ================= FILTER HEADER =================
+            function updateFilterVendor() {
+                filterVendor.innerHTML = '<option value="">-- Pilih Vendor --</option>';
+                const vendorsFromHeader = [...new Set(headers.map(h => h.vendor))];
+                if (vendorsFromHeader.length === 0) { filterVendor.disabled = true; filterPO.disabled = true; headerTableBody.innerHTML = ""; return; }
+                filterVendor.disabled = false;
+                vendorsFromHeader.forEach(v => { let opt = document.createElement("option"); opt.value = v; opt.textContent = v; filterVendor.appendChild(opt); });
+                // Reset PO filter
+                filterPO.innerHTML = '<option value="">-- Pilih PO --</option>';
+                filterPO.disabled = true;
+                headerTableBody.innerHTML = "";
+            }
+
+            filterVendor.addEventListener("change", () => {
+                const selVendor = filterVendor.value;
+                filterPO.innerHTML = '<option value="">-- Pilih PO --</option>';
+                if (!selVendor) { filterPO.disabled = true; headerTableBody.innerHTML = ""; return; }
+                const posFromHeader = [...new Set(headers.filter(h => h.vendor === selVendor).map(h => h.po))];
+                posFromHeader.forEach(po => { let opt = document.createElement("option"); opt.value = po; opt.textContent = po; filterPO.appendChild(opt); });
+                filterPO.disabled = false;
+                headerTableBody.innerHTML = "";
+                renderTable();
+            });
+
+            filterPO.addEventListener("change", renderTable);
+
+            // ================= AQL & RESULT =================
+            function hitungAQL(qty) {
+                if (qty >= 2 && qty <= 8) return 2;
+                if (qty >= 9 && qty <= 15) return 3;
+                if (qty >= 16 && qty <= 25) return 5;
+                if (qty >= 26 && qty <= 50) return 8;
+                if (qty >= 51 && qty <= 90) return 13;
+                if (qty >= 91 && qty <= 150) return 20;
+                if (qty >= 151 && qty <= 280) return 32;
+                if (qty >= 281 && qty <= 500) return 50;
+                return Math.ceil(qty * 0.2);
+            }
+
+            function hitungResult(aql, rejected) { const rule = rejectRules.find(r => aql >= r.minAql && aql <= r.maxAql); if (!rule) return "UNDEFINED"; return rejected <= rule.maxReject ? "APPROVED" : "FAILED"; }
+
+            // ================= LOAD HEADER DARI FIREBASE =================
+            async function loadHeaders() {
+                const snapshot = await getDocs(collection(db, "headers"));
+                headers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateFilterVendor();
+            }
+            loadHeaders();
+
+            // ================= SAVE HEADER =================
+            saveHeaderBtn.addEventListener("click", async () => {
+                const vendor = vendorSelect.value;
+                const po = poSelect.value;
+                const inspector = document.getElementById("inspectorSelect").value;
+                const date = document.getElementById("inspectDate").value;
+
+                if (!vendor || !po || !inspector || !date) { return alert("Semua field harus diisi lengkap sebelum disimpan!"); }
+
+                const exists = headers.find(h => h.vendor === vendor && h.po === po);
+                if (exists) return alert(`Data header untuk Vendor: ${vendor} dan PO: ${po} sudah tersimpan!`);
+
+                const newHeader = { vendor, po, inspector, date };
+
+                try {
+                    const docRef = await addDoc(collection(db, "headers"), newHeader);
+                    headers.push({ id: docRef.id, ...newHeader });
+                    alert("Header berhasil disimpan!");
+
+                    // ✅ Reset semua input agar clean
+                    vendorSelect.value = ""; poSelect.innerHTML = '<option value="">-- Pilih PO --</option>'; poSelect.disabled = true;
+                    document.getElementById("inspectorSelect").value = "";
+                    document.getElementById("inspectDate").value = "";
+
                     updateFilterVendor();
-                }
-                loadHeaders();
+                    headerTableBody.innerHTML = ""; // tabel kosong dulu
+                } catch (err) { console.error(err); alert("Gagal menyimpan ke Firebase. Cek console."); }
+            });
 
-                // ================= SAVE HEADER =================
-                saveHeaderBtn.addEventListener("click", async () => {
-                    const vendor = vendorSelect.value;
-                    const po = poSelect.value;
-                    const inspector = document.getElementById("inspectorSelect").value;
-                    const date = document.getElementById("inspectDate").value;
+            backToMenuBtn.addEventListener("click", () => showSection("dashboard"));
 
-                    if (!vendor || !po || !inspector || !date) { return alert("Semua field harus diisi lengkap sebelum disimpan!"); }
+            // ================= DELETE HEADER =================
+            window.deletePO = async function (po) {
+                const headersToDelete = headers.filter(h => h.po === po);
+                try {
+                    for (let h of headersToDelete) { await deleteDoc(doc(db, "headers", h.id)); }
+                    headers = headers.filter(h => h.po !== po);
+                    updateFilterVendor();
+                    headerTableBody.innerHTML = "";
+                    alert(`PO ${po} berhasil dihapus!`);
+                } catch (err) { console.error(err); alert("Gagal menghapus PO. Cek console."); }
+            }
 
-                    const exists = headers.find(h => h.vendor === vendor && h.po === po);
-                    if (exists) return alert(`Data header untuk Vendor: ${vendor} dan PO: ${po} sudah tersimpan!`);
+            // ================= RENDER TABLE =================
+            function renderTable() {
+                const selVendor = filterVendor.value;
+                const selPO = filterPO.value;
+                headerTableBody.innerHTML = "";
 
-                    const newHeader = { vendor, po, inspector, date };
+                if (!selVendor && !selPO) return;
 
-                    try {
-                        const docRef = await addDoc(collection(db, "headers"), newHeader);
-                        headers.push({ id: docRef.id, ...newHeader });
-                        alert("Header berhasil disimpan!");
-
-                        // ✅ Reset semua input agar clean
-                        vendorSelect.value = ""; poSelect.innerHTML = '<option value="">-- Pilih PO --</option>'; poSelect.disabled = true;
-                        document.getElementById("inspectorSelect").value = "";
-                        document.getElementById("inspectDate").value = "";
-
-                        updateFilterVendor();
-                        headerTableBody.innerHTML = ""; // tabel kosong dulu
-                    } catch (err) { console.error(err); alert("Gagal menyimpan ke Firebase. Cek console."); }
+                let filtered = headers.filter(h => {
+                    if (selVendor && h.vendor !== selVendor) return false;
+                    if (selPO && h.po !== selPO) return false;
+                    return true;
                 });
 
-                backToMenuBtn.addEventListener("click", () => showSection("dashboard"));
-
-                // ================= DELETE HEADER =================
-                window.deletePO = async function (po) {
-                    const headersToDelete = headers.filter(h => h.po === po);
-                    try {
-                        for (let h of headersToDelete) { await deleteDoc(doc(db, "headers", h.id)); }
-                        headers = headers.filter(h => h.po !== po);
-                        updateFilterVendor();
-                        headerTableBody.innerHTML = "";
-                        alert(`PO ${po} berhasil dihapus!`);
-                    } catch (err) { console.error(err); alert("Gagal menghapus PO. Cek console."); }
-                }
-
-                // ================= RENDER TABLE =================
-                function renderTable() {
-                    const selVendor = filterVendor.value;
-                    const selPO = filterPO.value;
-                    headerTableBody.innerHTML = "";
-
-                    if (!selVendor && !selPO) return;
-
-                    let filtered = headers.filter(h => {
-                        if (selVendor && h.vendor !== selVendor) return false;
-                        if (selPO && h.po !== selPO) return false;
-                        return true;
-                    });
-
-                    filtered.forEach(h => {
-                        const items = dataByKode[h.po]?.items || [];
-                        items.forEach(item => {
-                            const tr = document.createElement("tr");
-                            tr.innerHTML = `
+                filtered.forEach(h => {
+                    const items = dataByKode[h.po]?.items || [];
+                    items.forEach(item => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
                 <td>${h.po}</td>
                 <td><img src="${item.image}" width="50"></td>
                 <td>${item.item}</td>
@@ -804,202 +861,202 @@
                     <button onclick="deletePO('${h.po}')">Delete</button>
                 </td>
             `;
-                            headerTableBody.appendChild(tr);
-                        });
+                        headerTableBody.appendChild(tr);
                     });
+                });
+            }
+            // ================= STEP 2 GLOBAL =================
+            let step2Data = [];       // menyimpan data Step 2 dari Firebase
+            let uploadedImages = [];  // menampung image sebelum save
+
+            const uploadInput = document.getElementById("upload-img");
+            const previewDiv = document.getElementById("preview-img");
+
+            // ================= IMAGE UPLOAD =================
+            uploadInput.addEventListener("change", (e) => {
+                const files = Array.from(e.target.files);
+
+                if (uploadedImages.length + files.length > 10) {
+                    alert("Maksimal 10 gambar per section!");
+                    return;
                 }
-                // ================= STEP 2 GLOBAL =================
-                let step2Data = [];       // menyimpan data Step 2 dari Firebase
-                let uploadedImages = [];  // menampung image sebelum save
 
-                const uploadInput = document.getElementById("upload-img");
-                const previewDiv = document.getElementById("preview-img");
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        uploadedImages.push(ev.target.result); // simpan base64
+                        const img = document.createElement("img");
+                        img.src = ev.target.result;
+                        img.style.width = "80px";
+                        img.style.height = "80px";
+                        img.style.objectFit = "cover";
+                        img.style.margin = "2px";
+                        previewDiv.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
 
-                // ================= IMAGE UPLOAD =================
-                uploadInput.addEventListener("change", (e) => {
-                    const files = Array.from(e.target.files);
+                uploadInput.value = "";
+            });
 
-                    if (uploadedImages.length + files.length > 10) {
-                        alert("Maksimal 10 gambar per section!");
-                        return;
-                    }
+            // ================= VOICE INPUT =================
+            let recognition;
+            document.getElementById("voiceReport").addEventListener("click", () => {
+                if (!('webkitSpeechRecognition' in window)) {
+                    alert("Voice recognition tidak tersedia");
+                    return;
+                }
 
-                    files.forEach(file => {
-                        const reader = new FileReader();
-                        reader.onload = function (ev) {
-                            uploadedImages.push(ev.target.result); // simpan base64
-                            const img = document.createElement("img");
-                            img.src = ev.target.result;
-                            img.style.width = "80px";
-                            img.style.height = "80px";
-                            img.style.objectFit = "cover";
-                            img.style.margin = "2px";
-                            previewDiv.appendChild(img);
-                        };
-                        reader.readAsDataURL(file);
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = "id-ID";
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                recognition.start();
+
+                recognition.onresult = function (event) {
+                    const text = event.results[0][0].transcript;
+                    document.getElementById("inspectionReport").value += text;
+                };
+            });
+
+            // ================= TRANSLATE =================
+            document.getElementById("translateReport").addEventListener("click", async () => {
+                const text = document.getElementById("inspectionReport").value.trim();
+                const lang = document.getElementById("translateLangReport").value;
+                if (!text) return alert("Report kosong!");
+
+                try {
+                    const sourceLang = lang === "en" ? "id" : "en";
+                    const targetLang = lang;
+
+                    const res = await fetch("https://libretranslate.de/translate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ q: text, source: sourceLang, target: targetLang, format: "text" })
                     });
 
-                    uploadInput.value = "";
-                });
-
-                // ================= VOICE INPUT =================
-                let recognition;
-                document.getElementById("voiceReport").addEventListener("click", () => {
-                    if (!('webkitSpeechRecognition' in window)) {
-                        alert("Voice recognition tidak tersedia");
-                        return;
+                    const data = await res.json();
+                    if (data?.translatedText) {
+                        document.getElementById("inspectionReport").value = data.translatedText;
+                    } else {
+                        alert("Gagal translate: response kosong");
                     }
+                } catch (err) {
+                    console.error(err);
+                    alert("Gagal translate");
+                }
+            });
 
-                    recognition = new webkitSpeechRecognition();
-                    recognition.lang = "id-ID";
-                    recognition.interimResults = false;
-                    recognition.maxAlternatives = 1;
-                    recognition.start();
+            // ================= GO TO STEP 2 =================
+            window.goToStep2 = function (headerPo, itemCode) {
+                const header = headers.find(h => h.po === headerPo);
+                if (!header) return alert("Data header tidak ditemukan!");
+                const item = dataByKode[headerPo].items.find(i => i.item === itemCode);
+                if (!item) return alert("Data item tidak ditemukan!");
 
-                    recognition.onresult = function (event) {
-                        const text = event.results[0][0].transcript;
-                        document.getElementById("inspectionReport").value += text;
-                    };
-                });
+                document.getElementById("step1").style.display = "none";
+                document.getElementById("step2").style.display = "block";
 
-                // ================= TRANSLATE =================
-                document.getElementById("translateReport").addEventListener("click", async () => {
-                    const text = document.getElementById("inspectionReport").value.trim();
-                    const lang = document.getElementById("translateLangReport").value;
-                    if (!text) return alert("Report kosong!");
+                // Set Step 2 info
+                document.getElementById("s2-vendor").textContent = header.vendor;
+                document.getElementById("s2-po").textContent = header.po;
+                document.getElementById("s2-item").textContent = item.item;
+                document.getElementById("s2-desc").textContent = item.desc;
+                document.getElementById("s2-qtypo").textContent = item.qty;
+                document.getElementById("s2-aql").textContent = header.qtyAQL || hitungAQL(item.qty);
+                document.getElementById("s2-inspector").textContent = header.inspector;
+                document.getElementById("s2-date").textContent = header.date;
 
-                    try {
-                        const sourceLang = lang === "en" ? "id" : "en";
-                        const targetLang = lang;
+                // Reset Step 2
+                document.getElementById("preview-img").innerHTML = "";
+                document.getElementById("inspectionReport").value = "";
+                document.getElementById("select-section").value = "";
+                uploadedImages = [];
+            };
 
-                        const res = await fetch("https://libretranslate.de/translate", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ q: text, source: sourceLang, target: targetLang, format: "text" })
-                        });
+            // ================= BACK TO STEP 1 =================
+            document.getElementById("s2-back").addEventListener("click", () => {
+                document.getElementById("step2").style.display = "none";
+                document.getElementById("step1").style.display = "block";
+            });
 
-                        const data = await res.json();
-                        if (data?.translatedText) {
-                            document.getElementById("inspectionReport").value = data.translatedText;
-                        } else {
-                            alert("Gagal translate: response kosong");
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        alert("Gagal translate");
-                    }
-                });
+            // ================= SAVE STEP 2 =================
+            document.getElementById("s2-save").addEventListener("click", async () => {
+                const vendor = document.getElementById("s2-vendor").textContent;
+                const po = document.getElementById("s2-po").textContent;
+                const item = document.getElementById("s2-item").textContent;
+                const desc = document.getElementById("s2-desc").textContent;
+                const qtyPO = document.getElementById("s2-qtypo").textContent;
+                const qtyAQL = document.getElementById("s2-aql").textContent;
+                const inspector = document.getElementById("s2-inspector").textContent;
+                const date = document.getElementById("s2-date").textContent;
+                const section = document.getElementById("select-section").value;
+                const report = document.getElementById("inspectionReport").value;
 
-                // ================= GO TO STEP 2 =================
-                window.goToStep2 = function (headerPo, itemCode) {
-                    const header = headers.find(h => h.po === headerPo);
-                    if (!header) return alert("Data header tidak ditemukan!");
-                    const item = dataByKode[headerPo].items.find(i => i.item === itemCode);
-                    if (!item) return alert("Data item tidak ditemukan!");
+                if (!vendor || !po || !item || !section || !report) {
+                    return alert("Semua field wajib diisi sebelum save Step 2!");
+                }
 
-                    document.getElementById("step1").style.display = "none";
-                    document.getElementById("step2").style.display = "block";
+                if (uploadedImages.length === 0) return alert("Minimal 1 gambar harus diupload!");
 
-                    // Set Step 2 info
-                    document.getElementById("s2-vendor").textContent = header.vendor;
-                    document.getElementById("s2-po").textContent = header.po;
-                    document.getElementById("s2-item").textContent = item.item;
-                    document.getElementById("s2-desc").textContent = item.desc;
-                    document.getElementById("s2-qtypo").textContent = item.qty;
-                    document.getElementById("s2-aql").textContent = header.qtyAQL || hitungAQL(item.qty);
-                    document.getElementById("s2-inspector").textContent = header.inspector;
-                    document.getElementById("s2-date").textContent = header.date;
+                // CEK DUPLIKAT SECTION
+                const duplicate = step2Data.find(d => d.po === po && d.item === item && d.section === section);
+                if (duplicate) return alert(`Section "${section}" untuk PO "${po}" dan Item "${item}" sudah ada!`);
 
-                    // Reset Step 2
-                    document.getElementById("preview-img").innerHTML = "";
+                try {
+                    const dataToSave = { vendor, po, item, desc, qtyPO, qtyAQL, inspector, date, section, report };
+
+                    uploadedImages.forEach((img, idx) => {
+                        if (idx < 10) dataToSave[`image${idx + 1}`] = img;
+                    });
+
+                    const docRef = await addDoc(collection(db, "step2"), dataToSave);
+                    step2Data.push({ id: docRef.id, ...dataToSave });
+
+                    alert("Step 2 berhasil disimpan!");
+
+                    // reset
                     document.getElementById("inspectionReport").value = "";
                     document.getElementById("select-section").value = "";
                     uploadedImages = [];
-                };
+                    previewDiv.innerHTML = "";
 
-                // ================= BACK TO STEP 1 =================
-                document.getElementById("s2-back").addEventListener("click", () => {
-                    document.getElementById("step2").style.display = "none";
-                    document.getElementById("step1").style.display = "block";
-                });
+                    renderStep2Table(); // render semua
+                    updateStep2FilterPO(); // update dropdown PO
 
-                // ================= SAVE STEP 2 =================
-                document.getElementById("s2-save").addEventListener("click", async () => {
-                    const vendor = document.getElementById("s2-vendor").textContent;
-                    const po = document.getElementById("s2-po").textContent;
-                    const item = document.getElementById("s2-item").textContent;
-                    const desc = document.getElementById("s2-desc").textContent;
-                    const qtyPO = document.getElementById("s2-qtypo").textContent;
-                    const qtyAQL = document.getElementById("s2-aql").textContent;
-                    const inspector = document.getElementById("s2-inspector").textContent;
-                    const date = document.getElementById("s2-date").textContent;
-                    const section = document.getElementById("select-section").value;
-                    const report = document.getElementById("inspectionReport").value;
+                } catch (err) {
+                    console.error(err);
+                    alert("Gagal save Step 2");
+                }
+            });
 
-                    if (!vendor || !po || !item || !section || !report) {
-                        return alert("Semua field wajib diisi sebelum save Step 2!");
+            // ================= DELETE STEP 2 =================
+            window.deleteStep2 = async function (id) {
+                try {
+                    await deleteDoc(doc(db, "step2", id));
+                    step2Data = step2Data.filter(d => d.id !== id);
+                    renderStep2Table();
+                    updateStep2FilterPO();
+                    alert("Data Step 2 berhasil dihapus!");
+                } catch (err) {
+                    console.error(err);
+                    alert("Gagal hapus Step 2");
+                }
+            };
+
+            // ================= RENDER TABLE STEP 2 =================
+            function renderStep2Table(data = step2Data) {
+                const tbody = document.querySelector("#step2-result tbody");
+                tbody.innerHTML = "";
+
+                data.forEach(d => {
+                    const tr = document.createElement("tr");
+                    let imgCols = "";
+                    for (let i = 1; i <= 10; i++) {
+                        imgCols += `<td>${d[`image${i}`] ? `<img src="${d[`image${i}`]}" width="50">` : ""}</td>`;
                     }
 
-                    if (uploadedImages.length === 0) return alert("Minimal 1 gambar harus diupload!");
-
-                    // CEK DUPLIKAT SECTION
-                    const duplicate = step2Data.find(d => d.po === po && d.item === item && d.section === section);
-                    if (duplicate) return alert(`Section "${section}" untuk PO "${po}" dan Item "${item}" sudah ada!`);
-
-                    try {
-                        const dataToSave = { vendor, po, item, desc, qtyPO, qtyAQL, inspector, date, section, report };
-
-                        uploadedImages.forEach((img, idx) => {
-                            if (idx < 10) dataToSave[`image${idx + 1}`] = img;
-                        });
-
-                        const docRef = await addDoc(collection(db, "step2"), dataToSave);
-                        step2Data.push({ id: docRef.id, ...dataToSave });
-
-                        alert("Step 2 berhasil disimpan!");
-
-                        // reset
-                        document.getElementById("inspectionReport").value = "";
-                        document.getElementById("select-section").value = "";
-                        uploadedImages = [];
-                        previewDiv.innerHTML = "";
-
-                        renderStep2Table(); // render semua
-                        updateStep2FilterPO(); // update dropdown PO
-
-                    } catch (err) {
-                        console.error(err);
-                        alert("Gagal save Step 2");
-                    }
-                });
-
-                // ================= DELETE STEP 2 =================
-                window.deleteStep2 = async function (id) {
-                    try {
-                        await deleteDoc(doc(db, "step2", id));
-                        step2Data = step2Data.filter(d => d.id !== id);
-                        renderStep2Table();
-                        updateStep2FilterPO();
-                        alert("Data Step 2 berhasil dihapus!");
-                    } catch (err) {
-                        console.error(err);
-                        alert("Gagal hapus Step 2");
-                    }
-                };
-
-                // ================= RENDER TABLE STEP 2 =================
-                function renderStep2Table(data = step2Data) {
-                    const tbody = document.querySelector("#step2-result tbody");
-                    tbody.innerHTML = "";
-
-                    data.forEach(d => {
-                        const tr = document.createElement("tr");
-                        let imgCols = "";
-                        for (let i = 1; i <= 10; i++) {
-                            imgCols += `<td>${d[`image${i}`] ? `<img src="${d[`image${i}`]}" width="50">` : ""}</td>`;
-                        }
-
-                        tr.innerHTML = `
+                    tr.innerHTML = `
 <td>${d.vendor}</td>
 <td>${d.po}</td>
 <td>${d.item}</td>
@@ -1010,48 +1067,46 @@
 ${imgCols}
 <td><button onclick="deleteStep2('${d.id}')">Delete</button></td>
 `;
-                        tbody.appendChild(tr);
-                    });
-                }
-
-                // ================= UPDATE SELECT PO STEP 2 =================
-                function updateStep2FilterPO() {
-                    const filterStep2PO = document.getElementById("filter-po");
-                    filterStep2PO.innerHTML = '<option value="">-- Select PO --</option>';
-
-                    const uniquePOs = [...new Set(step2Data.map(d => d.po))];
-                    uniquePOs.forEach(po => {
-                        const opt = document.createElement("option");
-                        opt.value = po;
-                        opt.textContent = po;
-                        filterStep2PO.appendChild(opt);
-                    });
-                }
-
-                // ================= FILTER TABEL BERDASARKAN PO =================
-                document.getElementById("filter-po").addEventListener("change", (e) => {
-                    const selectedPO = e.target.value;
-
-                    if (!selectedPO) {
-                        // Jika tidak ada PO yang dipilih, kosongkan tabel
-                        renderStep2Table([]);
-                    } else {
-                        // Tampilkan data yang sesuai PO yang dipilih
-                        const filtered = step2Data.filter(d => d.po === selectedPO);
-                        renderStep2Table(filtered);
-                    }
+                    tbody.appendChild(tr);
                 });
+            }
 
-                // ================= LOAD STEP 2 DARI FIREBASE =================
-                async function loadStep2Data() {
-                    const snapshot = await getDocs(collection(db, "step2"));
-                    step2Data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderStep2Table();
-                    updateStep2FilterPO();
+            // ================= UPDATE SELECT PO STEP 2 =================
+            function updateStep2FilterPO() {
+                const filterStep2PO = document.getElementById("filter-po");
+                filterStep2PO.innerHTML = '<option value="">-- Select PO --</option>';
+
+                const uniquePOs = [...new Set(step2Data.map(d => d.po))];
+                uniquePOs.forEach(po => {
+                    const opt = document.createElement("option");
+                    opt.value = po;
+                    opt.textContent = po;
+                    filterStep2PO.appendChild(opt);
+                });
+            }
+
+            // ================= FILTER TABEL BERDASARKAN PO =================
+            document.getElementById("filter-po").addEventListener("change", (e) => {
+                const selectedPO = e.target.value;
+
+                if (!selectedPO) {
+                    // Jika tidak ada PO yang dipilih, kosongkan tabel
+                    renderStep2Table([]);
+                } else {
+                    // Tampilkan data yang sesuai PO yang dipilih
+                    const filtered = step2Data.filter(d => d.po === selectedPO);
+                    renderStep2Table(filtered);
                 }
-
-                loadStep2Data();
             });
+
+            // ================= LOAD STEP 2 DARI FIREBASE =================
+            async function loadStep2Data() {
+                const snapshot = await getDocs(collection(db, "step2"));
+                step2Data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderStep2Table();
+                updateStep2FilterPO();
+                updateInventory();
+            }
 
             // ============= TABEL INVENTORY =================
             const inventoryVendor = document.getElementById("inventoryVendor");
@@ -1128,6 +1183,9 @@ ${imgCols}
                 updateInventoryFilter();
                 renderInventory();
             }
+
+            loadStep2Data();
+
         </script>
 
     </body>
