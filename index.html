@@ -515,7 +515,7 @@
                         </select> <label for="inventoryPO">Filter PO</label> <select id="inventoryPO" disabled>
                             <option value="">-- Pilih PO --</option>
                         </select>
-                        <button id="btnExportPDF">Export PDF</button>
+                        <button id="exportPdfBtn" class="btn btn-danger">Export PDF</button>
                     </div>
                     <!-- Table Inventory -->
                     <div class="table-wrapper">
@@ -562,6 +562,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1261,6 +1262,145 @@ ${imgCols}
 
             loadStep2Data();
 
+            // ============= EXPORT PDF INVENTORY ==============
+            document.getElementById("exportPdfBtn").addEventListener("click", async () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape', 'pt', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 20;
+
+                const vendor = document.getElementById("inventoryVendor").value;
+                const po = document.getElementById("inventoryPO").value;
+                if (!vendor) return alert("Silakan pilih Vendor terlebih dahulu!");
+                if (!po) return alert("Silakan pilih PO terlebih dahulu!");
+
+                const header = headers.find(h => h.vendor === vendor && h.po === po);
+                const inspector = header?.inspector || "-";
+                const inspectDate = header?.date || "-";
+                const printDate = new Date().toLocaleString('id-ID');
+
+                const dataRows = step2Data.filter(d => d.vendor === vendor && d.po === po);
+                if (dataRows.length === 0) return alert("Tidak ada data untuk Vendor & PO ini!");
+
+                // HEADER
+                doc.setFontSize(16);
+                doc.text("Summary Report Data Inspection", pageWidth / 2, 30, { align: "center" });
+                doc.setFontSize(10);
+                doc.text(`Vendor: ${vendor}`, margin, 50);
+                doc.text(`PO: ${po}`, margin + 250, 50);
+                doc.text(`Inspection: ${inspector}`, margin + 500, 50);
+                doc.text(`Inspect Date: ${inspectDate}`, margin, 65);
+                doc.text(`Print Date: ${printDate}`, margin + 250, 65);
+
+                // COLUMN HEADERS
+                const columns = [
+                    "Item", "Qty PO", "Qty Inspect", "Section", "Inspection Report",
+                    "Image 1", "Image 2", "Image 3", "Image 4", "Image 5",
+                    "Image 6", "Image 7", "Image 8", "Image 9", "Image 10"
+                ];
+
+                // MAP DATA FOR TABLE BODY (WITHOUT BASE64 STRINGS, JUST EMPTY FOR IMAGES)
+                const bodyData = dataRows.map(d => {
+                    return [
+                        d.item, d.qtyPO, d.qtyAQL, d.section, d.report,
+                        "", "", "", "", "",
+                        "", "", "", "", ""
+                    ];
+                });
+
+                // SET Y START after header
+                const startY = 90;
+
+                // KEEP TRACK OF PAGES FOR SIGNATURE
+                let finalY = startY;
+
+                doc.autoTable({
+                    startY: 90,
+                    head: [columns],
+                    body: bodyData,
+                    styles: { fontSize: 8, cellPadding: 4, valign: 'middle', minCellHeight: 40 },
+                    headStyles: { fillColor: [0, 102, 204], textColor: 255, halign: 'center' },
+                    alternateRowStyles: { fillColor: [240, 240, 240] },
+                    columnStyles: {
+                        0: { cellWidth: 60 },
+                        1: { cellWidth: 40, halign: 'center' },
+                        2: { cellWidth: 50, halign: 'center' },
+                        3: { cellWidth: 80 },
+                        4: { cellWidth: 150 },
+                        5: { cellWidth: 40, halign: 'center' },
+                        6: { cellWidth: 40, halign: 'center' },
+                        7: { cellWidth: 40, halign: 'center' },
+                        8: { cellWidth: 40, halign: 'center' },
+                        9: { cellWidth: 40, halign: 'center' },
+                        10: { cellWidth: 40, halign: 'center' },
+                        11: { cellWidth: 40, halign: 'center' },
+                        12: { cellWidth: 40, halign: 'center' },
+                        13: { cellWidth: 40, halign: 'center' },
+                        14: { cellWidth: 40, halign: 'center' },
+                    },
+                    didDrawCell: function (data) {
+                        // Hanya untuk baris body
+                        if (data.row.section === 'body') {
+                            const colIndex = data.column.index;
+                            if (colIndex >= 5 && colIndex <= 14) {
+                                const rowIndex = data.row.index;
+                                const row = dataRows[rowIndex];
+                                const imgKey = `image${colIndex - 4}`; // image1..image10
+                                const imgData = row[imgKey];
+                                if (imgData) {
+                                    const dim = 30;
+                                    const x = data.cell.x + (data.cell.width - dim) / 2;
+                                    const y = data.cell.y + (data.cell.height - dim) / 2;
+                                    try {
+                                        doc.addImage(imgData, 'JPEG', x, y, dim, dim);
+                                    } catch (e) {
+                                        // Jika gagal, tampilkan tanda centang kecil
+                                        doc.setFontSize(16);
+                                        doc.text("✔", x + dim / 4, y + dim * 0.75);
+                                        doc.setFontSize(8);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    didDrawPage: (data) => {
+                        finalY = data.cursor.y;
+                    },
+                    margin: { top: startY }
+                });
+
+                // HITUNG POSISI UNTUK SIGNATURE
+                const sigWidth = 150;
+                const sigHeight = 60;
+
+                // Margin antar kotak tanda tangan (lebih rapat)
+                const sigGap = 10;
+
+                // Tentukan posisi Y, mengikuti akhir tabel tetapi tidak melebihi halaman
+                let sigY = finalY + 20;
+                if (sigY + sigHeight + 20 > pageHeight) {
+                    sigY = pageHeight - sigHeight - 20;
+                }
+
+                // X start untuk 3 kolom tanda tangan di kanan
+                const sigXStart = pageWidth - (sigWidth * 3 + sigGap * 2);
+
+                // GAMBAR KOTAK TANDA TANGAN
+                for (let i = 0; i < 3; i++) {
+                    const x = sigXStart + i * (sigWidth + sigGap);
+                    doc.rect(x, sigY, sigWidth, sigHeight);
+                }
+
+                // TEKS DI DALAM KOTAK
+                doc.setFontSize(10);
+                doc.text(`Inspector: ${inspector}`, sigXStart + 5, sigY + 35);
+                doc.text("QC Vendor: _________", sigXStart + sigWidth + sigGap + 5, sigY + 35);
+                doc.text("Approved: _________", sigXStart + (sigWidth + sigGap) * 2 + 5, sigY + 35);
+
+                // SIMPAN PDF
+                doc.save(`Summary_Report_Data_Inspection_${po}.pdf`);
+            });
         </script>
 
     </body>
