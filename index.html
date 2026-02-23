@@ -9,6 +9,10 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <style>
+            * {
+                box-sizing: border-box;
+            }
+
             body,
             html {
                 margin: 0;
@@ -40,11 +44,22 @@
             .login-box input,
             .login-box button {
                 width: 100%;
-                padding: 12px;
+                padding: 14px 16px;
+                /* padding kiri kanan sama */
                 margin: 10px 0;
-                border-radius: 8px;
+                border-radius: 10px;
+                /* samakan radius */
                 border: none;
                 font-size: 16px;
+                box-sizing: border-box;
+                /* WAJIB supaya tidak melebar */
+            }
+
+            .login-box h2 {
+                font-size: 18px;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
             }
 
             .login-box button {
@@ -59,6 +74,15 @@
 
             .login-image {
                 width: 120px;
+                display: block;
+                margin: 0 auto 5px;
+            }
+
+            .login-help {
+                font-size: 12px;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
             }
 
             /* DASHBOARD */
@@ -279,11 +303,16 @@
         <!-- LOGIN PAGE -->
         <div id="loginPage">
             <div class="login-box">
-                <img src="ttps://www.jeffan.com/secure/extensions/Intente/Jeffan_21_1_0/21.1.0/img/jeffan-logo.png">
-                <h2>Login ERP System</h2>
+                <img src="https://www.jeffan.com/secure/extensions/Intente/Jeffan_21_1_0/21.1.0/img/jeffan-logo.png"
+                    class="login-image">
+                <h2>Login Application System</h2>
                 <input type="email" id="email" placeholder="Email" required>
                 <input type="password" id="password" placeholder="Password" required>
                 <button onclick="login()">Login</button>
+                <p class="login-help">
+                    If you forgot your username and password, please contact us.
+                    <a href="https://s.id/atrisna">admin</a>
+                </p>
             </div>
         </div>
 
@@ -396,8 +425,6 @@
                         <p><strong>Description:</strong> <span id="s2-desc"></span></p>
                         <p><strong>Qty PO:</strong> <span id="s2-qtypo"></span></p>
                         <p><strong>Qty AQL:</strong> <span id="s2-aql"></span></p>
-                        <p><strong>Qty Rejected:</strong> <span id="s2-qtyrej"></span></p>
-                        <p><strong>Result:</strong> <span id="s2-result"></span></p>
                         <p><strong>Inspector:</strong> <span id="s2-inspector"></span></p>
                         <p><strong>Inspect Date:</strong> <span id="s2-date"></span></p>
                     </div>
@@ -899,53 +926,101 @@
                 uploadInput.value = "";
             });
 
-            // ================= VOICE INPUT =================
-            let recognition;
-            document.getElementById("voiceReport").addEventListener("click", () => {
-                if (!('webkitSpeechRecognition' in window)) {
-                    alert("Voice recognition tidak tersedia");
-                    return;
-                }
+            // ======= Voice Input =======
+            function initVoiceInput(textareaId, buttonId) {
+                const btn = document.getElementById(buttonId);
+                const textarea = document.getElementById(textareaId);
 
-                recognition = new webkitSpeechRecognition();
-                recognition.lang = "id-ID";
+                const originalText = btn.textContent; // ✅ TAMBAHAN AMAN
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) return alert("Browser ini tidak mendukung voice input");
+
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'id-ID';
                 recognition.interimResults = false;
                 recognition.maxAlternatives = 1;
-                recognition.start();
 
-                recognition.onresult = function (event) {
-                    const text = event.results[0][0].transcript;
-                    document.getElementById("inspectionReport").value += text;
+                btn.onclick = () => {
+                    recognition.start();
+                    btn.textContent = "🎤 Listening...";
                 };
-            });
 
-            // ================= TRANSLATE =================
-            document.getElementById("translateReport").addEventListener("click", async () => {
-                const text = document.getElementById("inspectionReport").value.trim();
-                const lang = document.getElementById("translateLangReport").value;
-                if (!text) return alert("Report kosong!");
+                recognition.onresult = (event) => {
+                    const spokenText = event.results[0][0].transcript;
+
+                    textarea.value += (textarea.value ? " " : "") + spokenText;
+
+                    // SIMPAN DATASET DARI VOICE
+                    if (!textarea.dataset.original) {
+                        textarea.dataset.original = textarea.value;
+                    }
+                    textarea.dataset.current = textarea.value;
+                    textarea.dataset.lang = 'id';
+
+                    btn.textContent = originalText; // ✅ KEMBALIKAN
+                };
+
+                recognition.onerror = (e) => {
+                    console.error("Voice error:", e.error);
+                    btn.textContent = originalText; // ✅
+                };
+
+                recognition.onend = () => {
+                    btn.textContent = originalText; // ✅
+                };
+            }
+            // ======= SIMPAN INPUT MANUAL (FIX UTAMA ADA DI SINI) =======
+            document.getElementById("inspectionReport").addEventListener("input", (e) => {
+                // jika user mengetik → anggap teks BARU
+                e.target.dataset.original = e.target.value;
+                e.target.dataset.current = e.target.value;
+                e.target.dataset.lang = 'id'; // <-- INI KUNCI PERBAIKAN
+            });
+            // ======= Translate Multi Bahasa (Dropdown) =======
+            async function translateTextareaWithDropdown(textareaId, selectId) {
+                const textarea = document.getElementById(textareaId);
+                const select = document.getElementById(selectId);
+                const toLang = select.value;
+
+                // pastikan dataset selalu ada
+                if (!textarea.dataset.current) textarea.dataset.current = textarea.value;
+                if (!textarea.dataset.lang) textarea.dataset.lang = 'id';
+
+                const fromLang = textarea.dataset.lang;
+                const sourceText = textarea.dataset.current.trim();
+                if (!sourceText) return;
+
+                // jika target sama dengan source → kembalikan ke teks asli
+                if (fromLang === toLang) return;
 
                 try {
-                    const sourceLang = lang === "en" ? "id" : "en";
-                    const targetLang = lang;
-
-                    const res = await fetch("https://libretranslate.de/translate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ q: text, source: sourceLang, target: targetLang, format: "text" })
-                    });
-
+                    const res = await fetch(
+                        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${fromLang}|${toLang}`
+                    );
                     const data = await res.json();
-                    if (data?.translatedText) {
-                        document.getElementById("inspectionReport").value = data.translatedText;
-                    } else {
-                        alert("Gagal translate: response kosong");
+
+                    if (data.responseData.translatedText) {
+                        textarea.value = data.responseData.translatedText;
+                        textarea.dataset.current = data.responseData.translatedText;
+                        textarea.dataset.lang = toLang;
+                        const section = document.getElementById("select-section").value;
+                        if (section) {
+                            if (!step2Data[section]) step2Data[section] = [];
+                            step2Data[section].report = textarea.value;
+                        }
                     }
                 } catch (err) {
-                    console.error(err);
-                    alert("Gagal translate");
+                    console.error("Translate error", err);
                 }
-            });
+            }
+            // ======= Inisialisasi Voice =======
+            initVoiceInput("inspectionReport", "voiceReport");
+
+            // ======= Tombol Translate =======
+            document.getElementById("translateReport").onclick = () => {
+                translateTextareaWithDropdown("inspectionReport", "translateLangReport");
+            };
 
             // ================= GO TO STEP 2 =================
             window.goToStep2 = function (headerPo, itemCode) {
