@@ -109,7 +109,7 @@
             }
 
             .sidebar-header h3 {
-                font-size: 12px;
+                font-size: 10px;
                 margin: 0;
                 line-height: 1.2;
                 /* rapatkan */
@@ -141,81 +141,107 @@
                 position: relative;
             }
 
-            .sidebar h1 {
-                text-align: center;
-                margin-bottom: 15px;
-            }
-
-            .sidebar h2 {
-                text-align: center;
-                margin-bottom: 5px;
-                font-size: 14px;
-            }
-
-            .sidebar h3 {
-                text-align: center;
-                margin-bottom: 5px;
-                font-size: 14px;
-                color: rgb(245, 255, 255);
-            }
-
             /* ===============================
             SIDEBAR FIXED
             =================================*/
             .sidebar {
                 position: fixed;
-                /* sidebar tetap diam */
                 left: 0;
                 width: 270px;
                 height: 100vh;
                 overflow: hidden;
-                /* tidak scroll */
                 background: linear-gradient(180deg, #1a84f5 0%, #0f038f 100%);
                 color: white;
                 padding: 15px;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start;
                 text-align: center;
                 align-items: stretch;
-                /* ujung kanan lembut */
                 box-shadow: 2px 0 2px rgba(0, 0, 0, 0.1);
             }
 
             .sidebar ul {
                 list-style: none;
                 padding: 0;
-
+                display: flex;
+                flex-direction: column;
             }
 
+            /* Semua tombol menu sekarang mengikuti style logout */
             .sidebar ul li {
                 width: 100%;
                 padding: 10px 25px;
                 margin: 4px 0;
-                background: rgba(255, 255, 255, 0.15);
+                background: linear-gradient(130deg, #1a84f5 0%, #0f038f 100%);
                 color: white;
+                font-weight: 600;
                 border: none;
                 border-radius: 10px;
                 cursor: pointer;
                 font-size: 16px;
                 text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 10px;
                 transition: all 0.3s ease;
             }
 
+            /* Hover effect sama untuk semua tombol */
             .sidebar ul li:hover {
-                background: rgba(255, 255, 255, 0.3);
+                background: #239709;
+                /* merah gelap saat hover */
                 transform: translateX(4px);
             }
 
             .sidebar ul li.logout {
-                margin-top: auto;
-                background: #dc2626;
+                margin-top: 3px;
+                background: linear-gradient(130deg, #1a84f5 0%, #0f038f 100%);
                 font-weight: 600;
-                text-align: center;
+                text-align: left;
             }
 
             .sidebar ul li.logout:hover {
                 background: #991b1b;
+            }
+
+            /* =========================
+            LINK TOKO
+            ===========================*/
+            .toko-online {
+                margin-top: 3px;
+                text-align: center;
+                background: transparent;
+                padding: 10px;
+                box-shadow: none;
+                position: relative;
+                z-index: 1;
+            }
+
+            .toko-online h4 {
+                margin-top: auto;
+                font-size: 12px;
+            }
+
+            .link-toko {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 0px;
+                color: hsl(240, 100%, 100%);
+            }
+
+            .link-toko a {
+                font-size: 12px;
+                color: #eaf2f4;
+                margin: 2px 0;
+                text-align: center;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .link-toko a:hover {
+                color: #44eaf9;
             }
 
             /* ===============================
@@ -630,48 +656,6 @@
                 text-align: center;
                 margin-bottom: 10px;
             }
-
-            /* =========================
-            LINK TOKO
-            ===========================*/
-            .toko-online {
-                text-align: center;
-                margin: 2px 0;
-                background: transparent;
-                padding: 10px;
-                border-radius: 12px;
-                box-shadow: none;
-                position: relative;
-                z-index: 1;
-            }
-
-            .toko-online h4 {
-                font-size: 12px;
-                margin-top: 0px;
-                margin-bottom: 2px;
-            }
-
-            .link-toko {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-top: 0px;
-                color: hsl(240, 100%, 100%);
-            }
-
-            .link-toko a {
-                font-size: 12px;
-                color: #eaf2f4;
-                margin: 2px 0;
-                text-align: center;
-                text-decoration: none;
-                transition: color 0.3s ease;
-            }
-
-            .link-toko a:hover {
-                color: #44eaf9;
-            }
         </style>
     </head>
 
@@ -713,14 +697,14 @@
                     </div>
                 </div>
                 <ul>
-                    <li onclick="showSection('dashboard')">Dashboard</li>
+                    <li onclick="showSection('dashboard')">📊Dashboard</li>
                     <li onclick="showSection('step1')">📝Input Data</li>
                     <li onclick="showSection('inventory')">🗃️Inventory Data</li>
                     <li onclick="showSection('purchase')">📦Purchase Order</li>
                     <li id="galleryMenu">🖼️ Gallery Item</li>
-                    <li onclick="showSection('aqlSection')">📊 AQL Tabel</li>
+                    <li onclick="showSection('aqlSection')">📋 AQL Tabel</li>
                     <li onclick="showSection('guide')">💡 User Guide</li>
-                    <li class="logout" onclick="logout()">Logout</li>
+                    <li class="logout" onclick="logout()">🔓Logout System</li>
                 </ul>
 
                 <!-- LINK TOKO -->
@@ -1007,6 +991,7 @@
                     </div>
                 </section>
 
+                <!-- TABLE DISPLAY AQL -->
                 <section id="aqlSection" style="display:none;">
                     <h3>📘 MATRICK TABEL AQL (ACCEPTABLE QUALITY LEVEL)</h3>
 
@@ -1038,9 +1023,11 @@
                     </select>
                     <!-- tempat konten panduan muncul -->
                     <div id="guideContent" style="margin-top:15px;"></div>
-        </div>
-        </section>
-        </main>
+                </section>
+                <!-- IFRAME GLOBAL -->
+                <iframe id="externalView" style="display:none; width:100%; height:80vh; border:none;"></iframe>
+
+            </main>
         </div>
         <!-- Library JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1079,9 +1066,26 @@
                 if (id === 'dashboard') renderDashboardCharts();
             };
 
-            //-- FUNCTION MENU PURCHSAE ORDER & GALLERY ITEM -->
-            document.getElementById('poPrintBtn').addEventListener('click', function () {
-                window.open('https://boetepaythea-sudo.github.io/Purchase-Order', '_blank');
+            function openExternal(link) {
+                // sembunyikan semua section internal
+                document.querySelectorAll("section").forEach(s => s.style.display = "none");
+                // tampilkan iframe dan set link
+                const iframe = document.getElementById("externalView");
+                iframe.src = link;
+                iframe.style.display = "block";
+            }
+
+            function backToSection(sectionId) {
+                // sembunyikan iframe
+                const iframe = document.getElementById("externalView");
+                iframe.style.display = "none";
+                iframe.src = "";
+                // tampilkan section yang diinginkan
+                document.getElementById(sectionId).style.display = "block";
+            }
+
+            document.getElementById("poPrintBtn").addEventListener("click", () => {
+                window.location.href = "https://boetepaythea-sudo.github.io/Purchase-Order";
             });
 
             document.getElementById('galleryMenu').addEventListener('click', function () {
@@ -1119,7 +1123,6 @@
             /* ================= MASTER DATA PO ================= */
 
             const dataByKode = {
-
                 "CG2512-01": {
                     Vendor: "V68 PT. FURNILAC PRIMAGUNA",
                     ecrd: "2026-03-05",
@@ -6211,7 +6214,7 @@
     </p>
   `,
             };
-     // ================= STEP 1 =================
+            // ================= STEP 1 =================
             const rejectRules = [
                 { minAql: 2, maxAql: 13, maxReject: 0 },
                 { minAql: 20, maxAql: 20, maxReject: 1 },
