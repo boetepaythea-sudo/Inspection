@@ -6504,6 +6504,7 @@
 
             // ================= GO TO STEP 2 =================
             window.goToStep2 = function (headerPo, itemCode) {
+                showSection("step2");
                 const header = headers.find(h => h.po === headerPo);
                 if (!header) return alert("Data header tidak ditemukan!");
                 const item = dataByKode[headerPo].items.find(i => i.item === itemCode);
