@@ -6211,7 +6211,7 @@
     </p>
   `,
             };
-            // ================= STEP 1 =================
+     // ================= STEP 1 =================
             const rejectRules = [
                 { minAql: 2, maxAql: 13, maxReject: 0 },
                 { minAql: 20, maxAql: 20, maxReject: 1 },
@@ -6288,6 +6288,7 @@
                 const snapshot = await getDocs(collection(db, "headers"));
                 headers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateFilterVendor();
+                renderTable();
             }
             loadHeaders();
 
@@ -6303,7 +6304,7 @@
                 const exists = headers.find(h => h.vendor === vendor && h.po === po);
                 if (exists) return alert(`Data header untuk Vendor: ${vendor} dan PO: ${po} sudah tersimpan!`);
 
-                const newHeader = { vendor, po, inspector, date };
+                const newHeader = { vendor, po, inspector, date, items: dataByKode[po]?.items || [] };
 
                 try {
                     const docRef = await addDoc(collection(db, "headers"), newHeader);
@@ -6349,7 +6350,7 @@
                 });
 
                 filtered.forEach(h => {
-                    const items = dataByKode[h.po]?.items || [];
+                    const items = h.items || [];
                     items.forEach(item => {
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
