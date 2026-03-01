@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>ERP Dashboard - Full Version</title>
+        <title>ERP Dashboard</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
@@ -689,7 +689,7 @@
                     <img src="https://www.jeffan.com/secure/extensions/Intente/Jeffan_21_1_0/21.1.0/img/jeffan-logo.png"
                         class="sidebar-logo" alt="Logo Sidebar">
                     <h2>Application Data Support</h2>
-                    <h3>Update.Ver.02.V.2026</h3>
+                    <h3>Update.Ver.03.VI.2026</h3>
 
                     <div id="clock-container">
                         <div id="clock-time">00:00:00</div>
@@ -721,21 +721,21 @@
                 <!-- Dashboard -->
                 <section id="dashboard">
                     <h3>Dashboard</h3>
-                    <p>Selamat datang di ERP System</p>
+                    <p>Welcome to Jeffan ERP Application Support System</p>
 
                     <div class="charts-container">
                         <div class="chart-box">
-                            <h4>Sales Penjualan per Bulan</h4>
+                            <h4>Sales per Month</h4>
                             <canvas id="salesPieChart"></canvas>
                         </div>
 
                         <div class="chart-box">
-                            <h4>Sales Bulan Lalu vs Bulan Berjalan</h4>
+                            <h4>Last Month's Sales vs. This Month's Sales</h4>
                             <canvas id="salesLineChart"></canvas>
                         </div>
 
                         <div class="chart-box">
-                            <h4>Purchase Order per Bulan</h4>
+                            <h4>Purchase Orders per Month</h4>
                             <canvas id="poBarChart"></canvas>
                         </div>
                 </section>
@@ -6504,7 +6504,6 @@
 
             // ================= GO TO STEP 2 =================
             window.goToStep2 = function (headerPo, itemCode) {
-                showSection("step2");
                 const header = headers.find(h => h.po === headerPo);
                 if (!header) return alert("Data header tidak ditemukan!");
                 const item = dataByKode[headerPo].items.find(i => i.item === itemCode);
@@ -7062,10 +7061,10 @@
                 salesPieChart = new Chart(pieCtx, {
                     type: 'pie',
                     data: {
-                        labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'],
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
                         datasets: [{
                             label: 'Sales',
-                            data: [120, 150, 180, 90, 200, 170],
+                            data: [2790519, 2185354, 0, 0, 0, 0],
                             backgroundColor: ['#2563eb', '#10b981', '#facc15', '#f97316', '#8b5cf6', '#ec4899']
                         }]
                     },
@@ -7078,10 +7077,10 @@
                 salesLineChart = new Chart(lineCtx, {
                     type: 'line',
                     data: {
-                        labels: ['Bulan Lalu', 'Bulan Berjalan'],
+                        labels: ['Last Month', 'Current month'],
                         datasets: [{
                             label: 'Sales',
-                            data: [500, 650],
+                            data: [2790519, 2185354],
                             borderColor: '#2563eb',
                             backgroundColor: 'rgba(37,99,235,0.2)',
                             fill: true,
@@ -7095,10 +7094,10 @@
                 poBarChart = new Chart(barCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                         datasets: [{
                             label: 'Purchase Order',
-                            data: [50, 75, 60, 90, 120, 80],
+                            data: [11673, 7739, 0, 0, 0, 0],
                             backgroundColor: '#10b981'
                         }]
                     },
