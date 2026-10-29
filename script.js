@@ -1,3 +1,4 @@
+/* JavaScript digabung untuk versi trial satu file. */
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import {getAuth, setPersistence, browserSessionPersistence, signInWithEmailAndPassword, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
             import {getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, writeBatch} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -139,32 +140,36 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
             });
 
             //-- FUNCTION CLOCK UPDATE -->
-            document.addEventListener("DOMContentLoaded", function () {
-                function updateClock() {
-                    const now = new Date();
+            // Jangan bergantung hanya pada DOMContentLoaded: top-level await Firebase
+            // bisa membuat kode ini dijalankan setelah event tersebut sudah lewat.
+            function updateClock() {
+                const now = new Date();
 
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
 
-                    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-                    const dayName = days[now.getDay()];
-                    const date = now.getDate();
-                    const month = months[now.getMonth()];
-                    const year = now.getFullYear();
+                const dayName = days[now.getDay()];
+                const date = now.getDate();
+                const month = months[now.getMonth()];
+                const year = now.getFullYear();
 
-                    document.getElementById("clock-time").textContent =
-                        `${hours}:${minutes}:${seconds}`;
+                const clockTime = document.getElementById("clock-time");
+                const clockDate = document.getElementById("clock-date");
+                if (clockTime) clockTime.textContent = `${hours}:${minutes}:${seconds}`;
+                if (clockDate) clockDate.textContent = `${dayName}, ${date} ${month} ${year}`;
+            }
 
-                    document.getElementById("clock-date").textContent =
-                        `${dayName}, ${date} ${month} ${year}`;
-                }
-
-                setInterval(updateClock, 1000);
+            // Mulai segera jika HTML sudah siap; jika belum, tunggu DOM siap.
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", updateClock, { once: true });
+            } else {
                 updateClock();
-            });
+            }
+            setInterval(updateClock, 1000);
 
             /* ================= MASTER DATA PO DARI FIREBASE =================
              * Sumber PO: collection Firestore "purchaseOrders"
@@ -1820,6 +1825,7 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
                     showLoginNotification("Login berhasil. Membuka dashboard...", "success");
                     document.getElementById("loginPage").style.display = "none";
                     document.getElementById("dashboardPage").style.display = "flex";
+                    if (typeof updateClock === "function") updateClock();
                     showSection("dashboard");
                 } catch (err) {
                     loginFailedAttempts++;
@@ -1871,6 +1877,7 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
 
                     document.getElementById("loginPage").style.display = "none";
                     document.getElementById("dashboardPage").style.display = "flex";
+                    if (typeof updateClock === "function") updateClock();
                     showSection("dashboard");
 
                     // ✅ Tampilkan welcome overlay HANYA saat login baru
