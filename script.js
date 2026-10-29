@@ -1,5 +1,5 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-            import {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import {getAuth, setPersistence, browserSessionPersistence, signInWithEmailAndPassword, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
             import {getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, writeBatch} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
             const firebaseConfig = {
@@ -14,6 +14,8 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
 
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
+            // Sesi hanya berlaku untuk sesi tab/browser; tidak dipertahankan sebagai login permanen.
+            await setPersistence(auth, browserSessionPersistence);
             const db = getFirestore(app);
             let isDashboardAdmin = false;
 
@@ -1657,30 +1659,42 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
             // ===============================
             // LOGIN & LOGUT DATA
             // ===============================
-            const IDLE_LIMIT = 30 * 60; // 30 menit dalam detik
-            let idleTime = 0;
+            const IDLE_LIMIT = 15 * 60 * 1000; // 15 menit dalam milidetik
+            let lastActivityAt = Date.now();
+            let autoLogoutInProgress = false;
 
-            function resetIdleTimer() {idleTime = 0;}
-
-            function autoLogout() {
-                signOut(auth).then(() => {
-                    alert("Anda telah logout karena tidak aktif selama 30 menit!");
-                    document.getElementById("dashboardPage").style.display = "none";
-                    document.getElementById("loginPage").style.display = "flex";
-                });
+            function resetIdleTimer() {
+                lastActivityAt = Date.now();
             }
 
-            // Set interval hitung idle
-            setInterval(() => {
-                if (auth.currentUser) {
-                    idleTime++;
-                    if (idleTime >= IDLE_LIMIT) autoLogout();
+            async function autoLogout() {
+                if (!auth.currentUser || autoLogoutInProgress) return;
+                autoLogoutInProgress = true;
+                try {
+                    await signOut(auth);
+                    alert("Sesi Anda berakhir karena tidak aktif selama 15 menit. Silakan login kembali.");
+                } catch (error) {
+                    console.error("Gagal mengakhiri sesi otomatis:", error);
+                } finally {
+                    document.getElementById("dashboardPage").style.display = "none";
+                    document.getElementById("loginPage").style.display = "flex";
+                    autoLogoutInProgress = false;
                 }
-            }, 1000);
+            }
 
-            // Reset timer saat aktivitas user
-            ["mousemove", "keydown", "scroll", "click"].forEach(event =>
-                document.addEventListener(event, resetIdleTimer, true)
+            function checkIdleTimeout() {
+                if (auth.currentUser && Date.now() - lastActivityAt >= IDLE_LIMIT) {
+                    autoLogout();
+                }
+            }
+
+            // Periksa batas waktu juga saat tab kembali aktif, termasuk ketika timer browser ditunda.
+            setInterval(checkIdleTimeout, 5000);
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") checkIdleTimeout();
+            });
+            ["mousemove", "keydown", "scroll", "click", "touchstart", "input"].forEach(event =>
+                document.addEventListener(event, resetIdleTimer, {capture: true, passive: true})
             );
 
             // ===============================
@@ -1847,6 +1861,8 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
             // ===============================
             onAuthStateChanged(auth, user => {
                 if (user) {
+                    lastActivityAt = Date.now();
+                    autoLogoutInProgress = false;
                     // Periksa role terpisah untuk menentukan akses upload Dashboard.
                     refreshDashboardAdminAccess(user);
                     // Update User ID
